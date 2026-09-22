@@ -157,11 +157,29 @@ db.stats()
 
 La salida de db.stats() provee información crítica de rendimiento y capacidad:
 
-collections y objects: Informa la cantidad de colecciones y el número total de documentos, permitiendo monitorear el crecimiento del volumen de datos.
+`collections` y `objects`: Informa la cantidad de colecciones y el número total de documentos, permitiendo monitorear el crecimiento del volumen de datos.
 
-dataSize y storageSize: Indican el tamaño real de los datos sin procesar frente al espacio físico que ocupan en disco (incluyendo la compresión del motor WiredTiger). La diferencia entre ambos permite identificar fragmentación o calcular tasas de compresión.
+`dataSize` y `storageSize`: Indican el tamaño real de los datos sin procesar frente al espacio físico que ocupan en disco. La diferencia entre ambos permite identificar fragmentación o calcular tasas de compresión.
 
-indexes e indexSize: Refleja la cantidad de índices creados y la memoria RAM que consumen. Un DBA supervisa esta métrica para garantizar que los índices más utilizados quepan en memoria y no degraden el rendimiento.
+`indexes` e `indexSize`: Refleja la cantidad de índices creados y la memoria RAM que consumen. Un DBA supervisa esta métrica para garantizar que los índices más utilizados quepan en memoria y no degraden el rendimiento.
+
+---
+
+## 7. Automatización con Seed Script
+
+Para automatizar la creación del entorno de pruebas se diseñó el script `seed_badavanzada.js` con la mismas inserciones del paso 4. 
+
+El script aplica el método `db.estudiantes.drop()` antes del `insertMany()` para garantizar **idempotencia**: no importa cuántas veces se ejecute, el estado final de la base de datos siempre será predecible y consistente, sin duplicar registros.
+
+Se ejecuta dentro del shell mediante:
+```javascript
+load("seed_badavanzada.js")
+```
+
+<img width="713" height="50" alt="image" src="https://github.com/user-attachments/assets/af56ddc4-3e29-4c15-afef-296c543a3843" />
+
+
+
 
 
 
