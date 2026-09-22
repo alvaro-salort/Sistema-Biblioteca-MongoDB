@@ -1,0 +1,66 @@
+[
+  {
+    "_id": "PROD-001",
+    "nombre": "Notebook Pro 15",
+    "categoria": "Computación",
+    "precio": 1250.0,
+    "stock": 15,
+    "activo": true
+  },
+  {
+    "_id": "PROD-002",
+    "nombre": "Mouse Inalámbrico",
+    "categoria": "Accesorios",
+    "precio": 25.5,
+    "stock": 80,
+    "activo": true
+  },
+  {
+    "_id": "PROD-003",
+    "nombre": "Teclado Mecánico RGB",
+    "categoria": "Accesorios",
+    "precio": 85.0,
+    "stock": 30,
+    "activo": true
+  },
+  {
+    "_id": "PROD-004",
+    "nombre": "Monitor 27 Pulgadas 144Hz",
+    "categoria": "Monitores",
+    "precio": 320.0,
+    "stock": 10,
+    "activo": true
+  },
+  {
+    "_id": "PROD-005",
+    "nombre": "Auriculares Bluetooth Cancelación Ruido",
+    "categoria": "Audio",
+    "precio": 150.0,
+    "stock": 25,
+    "activo": true
+  },
+  {
+    "_id": "PROD-006",
+    "nombre": "Pad Mouse XXL",
+    "categoria": "Accesorios",
+    "precio": 18.0,
+    "stock": 50,
+    "activo": false
+  },
+  {
+    "_id": "PROD-007",
+    "nombre": "Disco Externo SSD 1TB",
+    "categoria": "Almacenamiento",
+    "precio": 110.0,
+    "stock": 40,
+    "activo": true
+  },
+  {
+    "_id": "PROD-008",
+    "nombre": "Webcam Full HD 1080p",
+    "categoria": "Video",
+    "precio": 65.0,
+    "stock": 0,
+    "activo": false
+  }
+]
