@@ -1,0 +1,7 @@
+[
+  { "nombre": "Impresora Láser", "precio": 95000, "categoria": "Tecnología" },
+  { "nombre": "Mesa de Luz", "precio": 45000, "categoria": "Hogar" },
+  { "nombre": "Camisa de Lino", "precio": 22000, "categoria": "Ropa" },
+  { "nombre": "Silla Gamer", "precio": 180000, "categoria": "Tecnología" },
+  { "nombre": "Lámpara de Pie", "precio": 15000, "categoria": "Hogar" }
+]
