@@ -277,34 +277,34 @@ db.envios.aggregate([
 ## B.1 JSON y modelado de documentos
 
 ### 1. Diferencia entre JSON y BSON
-JSON es un formato de texto plano pensado para intercambiar datos, pero se limita a tipos básicos como cadenas, números, booleanos, objetos y arrays[cite: 16]. BSON es la representación binaria que usa MongoDB internamente para almacenar y procesar documentos de forma rápida[cite: 16]. BSON agrega tipos de datos como `ObjectId`, `Date` y `Decimal128`[cite: 6, 16]. Esta diferencia es determinante al diseñar un esquema porque permite realizar operaciones numéricas de alta precisión y filtros eficientes por fecha directamente en el motor de la base de datos[cite: 6, 16].
+JSON es un formato de texto plano pensado para intercambiar datos, pero se limita a tipos básicos como cadenas, números, booleanos, objetos y arrays. BSON es la representación binaria que usa MongoDB internamente para almacenar y procesar documentos de forma rápida. BSON agrega tipos de datos como `ObjectId`, `Date` y `Decimal128`. Esta diferencia es determinante al diseñar un esquema porque permite realizar operaciones numéricas de alta precisión y filtros eficientes por fecha directamente en el motor de la base de datos.
 
 ### 2. Criterio general para decidir entre embeber y referenciar
-La decisión depende de cómo la aplicación accede a los datos[cite: 16, 19]. Se prefiere embeber cuando los datos relacionados se consultan juntos de forma habitual y la relación es acotada (One-to-Few)[cite: 18, 19]. Se prefiere referenciar cuando los subdocumentos pertenecen a entidades con ciclo de vida independiente, cuando la relación puede crecer sin límite (One-to-Many o One-to-Squillions), o cuando el registro es compartido por varios documentos distintos[cite: 18, 19].
+La decisión depende de cómo la aplicación accede a los datos. Se prefiere embeber cuando los datos relacionados se consultan juntos de forma habitual y la relación es acotada (One-to-Few). Se prefiere referenciar cuando los subdocumentos pertenecen a entidades con ciclo de vida independiente, cuando la relación puede crecer sin límite (One-to-Many o One-to-Squillions), o cuando el registro es compartido por varios documentos distinto.
 
 ### 3. Antipatrón de array ilimitado (Massive array)
-Aparece cuando se agregan subdocumentos de forma continua dentro de un array sin poner un límite máximo de elementos[cite: 18, 23]. Esto impacta en el rendimiento de lectura y escritura a medida que el array crece y puede provocar que el documento supere el límite físico de 16 MB de MongoDB, lo que rechaza cualquier nueva escritura[cite: 23].
+Aparece cuando se agregan subdocumentos de forma continua dentro de un array sin poner un límite máximo de elementos. Esto impacta en el rendimiento de lectura y escritura a medida que el array crece y puede provocar que el documento supere el límite físico de 16 MB de MongoDB, lo que rechaza cualquier nueva escritura.
 
 ---
 
 ## B.2 JSON Schema y validación
 
 ### 4. Problema que resuelve JSON Schema
-JSON no impone reglas sobre qué claves o valores debe contener un objeto[cite: 16]. JSON Schema soluciona esa falta de estructura permitiendo definir un contrato de datos en el servidor (campos obligatorios, tipos de datos, valores permitidos y rangos)[cite: 6, 29]. De este modo se evita que entren datos corruptos o incompletos a la base de datos[cite: 6, 29].
+JSON no impone reglas sobre qué claves o valores debe contener un objeto. JSON Schema soluciona esa falta de estructura permitiendo definir un contrato de datos en el servidor (campos obligatorios, tipos de datos, valores permitidos y rangos). De este modo se evita que entren datos corruptos o incompletos a la base de datos.
 
 ### 5. Diferencias entre JSON Schema estándar y el validator de MongoDB
-1. MongoDB incorpora la clave `bsonType` en lugar del `type` tradicional para validar tipos de datos específicos de BSON como `objectId`, `date` o `decimal`[cite: 6, 29].
-2. La validación se ejecuta directamente en el motor de almacenamiento de MongoDB al definir la colección con el operador `$jsonSchema`[cite: 6, 29].
+1. MongoDB incorpora la clave `bsonType` en lugar del `type` tradicional para validar tipos de datos específicos de BSON como `objectId`, `date` o `decimal`.
+2. La validación se ejecuta directamente en el motor de almacenamiento de MongoDB al definir la colección con el operador `$jsonSchema`.
 
 ### 6. `validationAction: "error"` vs. `validationAction: "warn"`
-Con `"error"`, el motor rechaza de inmediato cualquier documento que no cumpla las reglas de validación[cite: 6]. Con `"warn"`, el documento se guarda igual, pero el servidor registra una advertencia en sus logs[cite: 30]. El modo `"warn"` es útil al migrar sistemas en producción donde se necesita auditar datos inconsistentes sin interrumpir la operación[cite: 21, 30].
+Con `"error"`, el motor rechaza de inmediato cualquier documento que no cumpla las reglas de validación. Con `"warn"`, el documento se guarda igual, pero el servidor registra una advertencia en sus logs. El modo `"warn"` es útil al migrar sistemas en producción donde se necesita auditar datos inconsistentes sin interrumpir la operación.
 
 ---
 
 ## B.3 Mongo Shell y Compass
 
 ### 7. Comportamiento de `use` y `show dbs`
-MongoDB aplica creación perezosa (*lazy creation*)[cite: 9]. El comando `use` posiciona el contexto en una base de datos, pero los archivos en disco se generan recién al realizar la primera operación de escritura (`insertOne` o `createCollection`)[cite: 9, 30]. Por eso `show dbs` ignora las bases de datos vacías[cite: 9, 30].
+MongoDB aplica creación perezosa (*lazy creation*). El comando `use` posiciona el contexto en una base de datos, pero los archivos en disco se generan recién al realizar la primera operación de escritura (`insertOne` o `createCollection`). Por eso `show dbs` ignora las bases de datos vacías.
 
 ### 8. Compass vs. Mongo Shell
 * **Compass es mejor para:**
@@ -315,21 +315,21 @@ MongoDB aplica creación perezosa (*lazy creation*)[cite: 9]. El comando `use` p
   2. Administrar servidores remotos o entornos donde no hay interfaz gráfica.
 
 ### 9. Información del comando `db.stats()`
-Muestra métricas generales de la base de datos: cantidad de colecciones, total de documentos, espacio ocupado en disco, tamaño gastado en índices y el promedio de peso por documento[cite: 30].
+Muestra métricas generales de la base de datos: cantidad de colecciones, total de documentos, espacio ocupado en disco, tamaño gastado en índices y el promedio de peso por documento.
 
 ---
 
 ## B.4 Operaciones de alta
 
 ### 10. `insertMany()` con `ordered: true` vs. `ordered: false`
-En modo `ordered: true` (comportamiento por defecto), MongoDB procesa el lote en orden correlativo y se detiene ante el primer error de clave duplicada (`E11000`), dejando sin insertar los registros siguientes[cite: 6, 30]. En modo `ordered: false`, el motor intenta insertar todos los documentos del lote sin importar los fallos puntuales, omitiendo los duplicados y reportando los errores al finalizar el proceso[cite: 6, 30].
+En modo `ordered: true` (comportamiento por defecto), MongoDB procesa el lote en orden correlativo y se detiene ante el primer error de clave duplicada (`E11000`), dejando sin insertar los registros siguientes. En modo `ordered: false`, el motor intenta insertar todos los documentos del lote sin importar los fallos puntuales, omitiendo los duplicados y reportando los errores al finalizar el proceso.
 
 ### 11. Write Concern (`w: 1` vs. `w: "majority"`)
-El *write concern* establece cuántos nodos deben confirmar una escritura para considerarla exitosa[cite: 30]. `w: 1` se conforma con la respuesta del nodo primario[cite: 30]. `w: "majority"` exige que la mayoría de los nodos del replica set confirmen la operación antes de dar el OK[cite: 30]. En un servidor standalone de desarrollo no hay diferencia práctica, pero en producción con replica set evita perder datos si el primario se cae antes de replicar[cite: 30].
+El *write concern* establece cuántos nodos deben confirmar una escritura para considerarla exitosa. `w: 1` se conforma con la respuesta del nodo primario. `w: "majority"` exige que la mayoría de los nodos del replica set confirmen la operación antes de dar el OK. En un servidor standalone de desarrollo no hay diferencia práctica, pero en producción con replica set evita perder datos si el primario se cae antes de replicar.
 
 ### 12. Estructura de un `ObjectId`
 Es una clave única de 12 bytes formada por:
-1. **4 bytes:** Marca de tiempo (*timestamp*) con la fecha exacta de creación[cite: 6].
+1. **4 bytes:** Marca de tiempo (*timestamp*) con la fecha exacta de creación.
 2. **5 bytes:** Identificador aleatorio único generado por proceso y máquina.
 3. **3 bytes:** Contador incremental inicializado al azar.
 
@@ -338,41 +338,40 @@ Es una clave única de 12 bytes formada por:
 ## B.5 CRUD y consultas
 
 ### 13. Riesgo de `updateOne()` sin `$set`
-Si se pasa un documento simple como segundo argumento sin usar `$set`, MongoDB reemplaza todo el documento original por ese nuevo objeto, borrando todos los campos que no hayan sido incluidos[cite: 2, 30]. Es un error frecuente en quien llega desde bases relacionales pensando que funciona como un `UPDATE ... SET`[cite: 2].
+Si se pasa un documento simple como segundo argumento sin usar `$set`, MongoDB reemplaza todo el documento original por ese nuevo objeto, borrando todos los campos que no hayan sido incluidos. Es un error frecuente en quien llega desde bases relacionales pensando que funciona como un `UPDATE ... SET`.
 
 ### 14. Opción `{ upsert: true }`
-Evalúa la condición del filtro: si encuentra un documento coincidente, lo actualiza; si no existe ninguno, crea un documento nuevo combinando las claves del filtro con la instrucción del update[cite: 6, 30]. Se aplica en casos como actualizar contadores o inventarios diarios donde el registro inicial puede no existir todavía[cite: 6, 30].
+Evalúa la condición del filtro: si encuentra un documento coincidente, lo actualiza; si no existe ninguno, crea un documento nuevo combinando las claves del filtro con la instrucción del update. Se aplica en casos como actualizar contadores o inventarios diarios donde el registro inicial puede no existir todavía.
 
 ### 15. `$lookup` vs. Patrón Extended Reference
-`$lookup` hace una combinación (*join*) en tiempo de ejecución entre colecciones[cite: 11, 30]. Conviene reemplazarlo por el patrón Extended Reference en consultas muy frecuentes sobre datos que cambian poco (como incluir el nombre del cliente dentro del envío), evitando el costo de cómputo del join en cada lectura[cite: 21, 30].
+`$lookup` hace una combinación (*join*) en tiempo de ejecución entre colecciones. Conviene reemplazarlo por el patrón Extended Reference en consultas muy frecuentes sobre datos que cambian poco (como incluir el nombre del cliente dentro del envío), evitando el costo de cómputo del join en cada lectura.
 
 ### 16. Índices compuestos vs. dos índices simples
-Un índice compuesto guarda el orden combinado de dos o más campos dentro del mismo árbol B[cite: 7, 30]. Es necesario cuando las consultas filtran y ordenan por esa combinación específica de campos[cite: 7]. Dos índices simples individuales no pueden sustituir a un índice compuesto para resolver esa ordenación conjunta[cite: 7, 30].
+Un índice compuesto guarda el orden combinado de dos o más campos dentro del mismo árbol B. Es necesario cuando las consultas filtran y ordenan por esa combinación específica de campos. Dos índices simples individuales no pueden sustituir a un índice compuesto para resolver esa ordenación conjunta.
 
 ### 17. Transacciones multi-documento
-Garantizan atomicidad en operaciones que involucran modificar múltiples documentos o colecciones (se confirman todas las escrituras o se revierten todas)[cite: 12, 30]. Exigen que la instancia del servidor corra configurada como un Replica Set o un clúster sharded[cite: 12, 30].
+Garantizan atomicidad en operaciones que involucran modificar múltiples documentos o colecciones (se confirman todas las escrituras o se revierten todas). Exigen que la instancia del servidor corra configurada como un Replica Set o un clúster sharded.
 
 ---
 
 ## B.6 Diseño de bases de datos en MongoDB
 
 ### 18. "Los datos que se usan juntos, se guardan juntos"
-Este principio busca resolver la consulta más frecuente de la aplicación leyendo la menor cantidad de documentos posible[cite: 16, 17]. A diferencia del modelo relacional, que busca eliminar toda redundancia normalizando tablas a costa de hacer joins, MongoDB prioriza el rendimiento de lectura permitiendo cierta duplicación de datos cuando el caso de uso lo justifica[cite: 16, 17].
+Este principio busca resolver la consulta más frecuente de la aplicación leyendo la menor cantidad de documentos posible. A diferencia del modelo relacional, que busca eliminar toda redundancia normalizando tablas a costa de hacer joins, MongoDB prioriza el rendimiento de lectura permitiendo cierta duplicación de datos cuando el caso de uso lo justifica.
 
 ### 19. Pasos del método de diseño
-1. **Describir el workload:** ¿Qué consultas y escrituras hace la aplicación, con qué frecuencia y prioridad?[cite: 17, 31]
-2. **Mapear relaciones:** ¿Cómo se conectan las entidades y qué cardinalidad tienen (1:1, 1:N, N:M)?[cite: 17, 31]
-3. **Aplicar patrones de diseño:** ¿Conviene embeber, referenciar o usar un patrón específico (Subset, Attribute, etc.) para cada colección?[cite: 17, 31]
-
+1. **Describir el workload:** ¿Qué consultas y escrituras hace la aplicación, con qué frecuencia y prioridad?
+2. **Mapear relaciones:** ¿Cómo se conectan las entidades y qué cardinalidad tienen (1:1, 1:N, N:M)?
+3. **Aplicar patrones de diseño:** ¿Conviene embeber, referenciar o usar un patrón específico (Subset, Attribute, etc.) para cada colección?
 ### 20. Dos patrones de diseño del catálogo
 * **Patrón Computed (Valores precalculados):** En un catálogo de productos se guarda el promedio de valoraciones y el total de reseñas directamente en el producto. Se recalcula solo al cargar una opinión nueva, evitando promediar miles de filas en cada visita.
 * **Patrón Polymorphic (Polimórfico):** En un sistema de cobros se guardan distintos métodos de pago (tarjetas, transferencias, billeteras virtuales) dentro de una misma colección `medios_pago`, diferenciando sus campos mediante la clave `tipo`.
 
 ### 21. Tres antipatrones de diseño
-1. **Massive Arrays:** Acumular listas sin límite degrada el tiempo de respuesta y arriesga superar los 16 MB por documento[cite: 23, 31].
-2. **Abuso de `$lookup`:** Abusar de joins en lecturas de alta frecuencia sobrecarga el procesador del servidor[cite: 23, 31].
-3. **Bloat de documentos:** Almacenar históricos viejos o datos sin uso en el documento activo encarece cada lectura innecesariamente[cite: 23, 31].
+1. **Massive Arrays:** Acumular listas sin límite degrada el tiempo de respuesta y arriesga superar los 16 MB por documento.
+2. **Abuso de `$lookup`:** Abusar de joins en lecturas de alta frecuencia sobrecarga el procesador del servidor.
+3. **Bloat de documentos:** Almacenar históricos viejos o datos sin uso en el documento activo encarece cada lectura innecesariamente.
 
 ### 22. Límites técnicos que condicionan el diseño
-* **Tamaño máximo de documento (16 MB):** Impide guardar colecciones completas o arrays sin cota dentro de un solo documento[cite: 23, 31].
-* **Límite de índices por colección (64):** Evita crear índices "por las dudas" y obliga a indexar solo los campos requeridos por el workload[cite: 23].
+* **Tamaño máximo de documento (16 MB):** Impide guardar colecciones completas o arrays sin cota dentro de un solo documento.
+* **Límite de índices por colección (64):** Evita crear índices "por las dudas" y obliga a indexar solo los campos requeridos por el workload.
